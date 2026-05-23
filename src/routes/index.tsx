@@ -25,8 +25,7 @@ function Index() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <FloatingHeader />
-      <FloatingTabs active={tab} onChange={setTab} />
+      <FloatingHeader active={tab} onChange={setTab} />
 
       <main className="mx-auto max-w-7xl px-6 pb-32 pt-32">
         {tab === "chat" && <Hero onStart={() => setTab("chat")} />}
@@ -51,25 +50,37 @@ function Index() {
   );
 }
 
-/* ───────── Floating header ───────── */
-function FloatingHeader() {
+/* ───────── Floating header (logo · tabs · wallet) ───────── */
+function FloatingHeader({ active, onChange }: { active: TabId; onChange: (t: TabId) => void }) {
   return (
     <header className="fixed inset-x-0 top-4 z-50 px-4">
-      <div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-foreground/10 bg-background/80 px-5 py-2.5 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.25)] backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-full border border-foreground/10 bg-background/80 px-4 py-2 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.25)] backdrop-blur-xl">
         <div className="flex items-center gap-2">
           <div className="grid h-7 w-7 place-items-center rounded-md bg-foreground text-background">
             <Sparkles className="h-3.5 w-3.5" />
           </div>
-          <div className="leading-none">
-            <div className="font-serif text-lg">xPrime</div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Intent trading</div>
-          </div>
+          <div className="font-serif text-lg leading-none">xPrime</div>
         </div>
-        <nav className="hidden items-center gap-8 text-sm md:flex">
-          <a href="#product" className="hover:opacity-70">Product</a>
-          <a href="#services" className="hover:opacity-70">Services</a>
-          <a href="#about" className="hover:opacity-70">About us</a>
+
+        <nav className="hidden items-center gap-1 lg:flex">
+          {TABS.map((t) => {
+            const Icon = t.icon;
+            const isActive = active === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => onChange(t.id)}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs transition ${
+                  isActive ? "bg-foreground text-background" : "text-foreground/70 hover:text-foreground"
+                }`}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {t.label}
+              </button>
+            );
+          })}
         </nav>
+
         <div className="flex items-center gap-2">
           <button className="hidden items-center gap-1.5 rounded-full border border-foreground/15 px-3 py-1.5 text-xs sm:inline-flex">
             Testnet <ChevronDown className="h-3 w-3" />
@@ -79,16 +90,10 @@ function FloatingHeader() {
           </button>
         </div>
       </div>
-    </header>
-  );
-}
 
-/* ───────── Floating tabs (replacing sidebar) ───────── */
-function FloatingTabs({ active, onChange }: { active: TabId; onChange: (t: TabId) => void }) {
-  return (
-    <div className="fixed inset-x-0 top-20 z-40 px-4">
-      <div className="mx-auto flex max-w-7xl justify-center">
-        <div className="flex items-center gap-1 rounded-full border border-foreground/10 bg-card/90 p-1 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.3)] backdrop-blur-xl">
+      {/* compact tab row for small screens */}
+      <div className="mx-auto mt-2 flex max-w-7xl justify-center lg:hidden">
+        <div className="flex items-center gap-1 overflow-x-auto rounded-full border border-foreground/10 bg-card/90 p-1 backdrop-blur-xl">
           {TABS.map((t) => {
             const Icon = t.icon;
             const isActive = active === t.id;
@@ -96,18 +101,18 @@ function FloatingTabs({ active, onChange }: { active: TabId; onChange: (t: TabId
               <button
                 key={t.id}
                 onClick={() => onChange(t.id)}
-                className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs transition ${
-                  isActive ? "bg-foreground text-background" : "text-foreground/70 hover:text-foreground"
+                className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs transition ${
+                  isActive ? "bg-foreground text-background" : "text-foreground/70"
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">{t.label}</span>
+                {t.label}
               </button>
             );
           })}
         </div>
       </div>
-    </div>
+    </header>
   );
 }
 
